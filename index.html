@@ -1330,6 +1330,18 @@ body.unterstuetzen-view .mission-closing {
   body.unterstuetzen-view .mission-closing {
     max-width: calc(100vw - 48px);
   }
+  /* Mobil: Boxen stehen übereinander, nicht nebeneinander — daher
+     die Desktop-Höhenausgleichs-Tricks (margin-top:auto auf den
+     Buttons + erzwungener margin-bottom unter dem Fördermitgliedschafts-
+     Text) hier ausschalten und beiden Buttons einen festen, gleichen
+     Abstand zum jeweiligen Fliesstext geben. */
+  body.unterstuetzen-view .support-grid .support-block > .foerder-link,
+  body.unterstuetzen-view .support-grid .support-block > .contact-email {
+    margin-top: 28px;
+  }
+  body.unterstuetzen-view .support-grid .unterstuetzen-foerder {
+    margin-bottom: 0;
+  }
 }
 @media (min-width: 641px) and (max-width: 900px) {
   body.unterstuetzen-view .unterstuetzen-body,
