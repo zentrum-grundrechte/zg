@@ -871,6 +871,43 @@ body.kontakt-view .contact-email { margin-top: 24px; }
 }
 .foerder-link:hover,
 .einmalspende-link:hover { background: var(--vermil); color: #fff; }
+/* Ausgegraute Variante — wie bei SEPA-Lastschrift-Kachel: kein Hover,
+   keine Klickbarkeit, graue Border + graue Schrift. */
+.foerder-link--coming,
+.foerder-link--coming:hover {
+  border-color: var(--rule);
+  color: var(--mid);
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+/* Gleiche Breite wie der „Schreiben Sie uns"-Button daneben:
+   unsichtbares Phantom-Label reserviert die Breite des Nachbartextes,
+   das kurze „Demnächst" sitzt mittig darüber. */
+.foerder-link--coming {
+  position: relative;
+  text-align: left;
+}
+/* Chevron an den rechten Button-Rand schieben — gleiche Position
+   wie der Pfeil im "Schreiben Sie uns"-Button daneben. */
+.foerder-link--coming .foerder-arrow {
+  position: absolute;
+  right: 0.45em;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0;
+}
+.foerder-link--coming::before {
+  content: "Schreiben Sie uns";
+  display: block;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+body.lang-en .foerder-link--coming::before {
+  content: "Write to us";
+}
 .foerder-arrow,
 .einmalspende-arrow {
   display: inline-block;
@@ -1128,11 +1165,15 @@ body.kontakt-view .contact-section { padding-bottom: 16px; }
    Body + Support-Blocks mittig und schmaler, kleinere Schrift, CTA-
    Reihe aus, Schluss-CTA-Box mit Newsletter-Trigger. */
 body.unterstuetzen-view .unterstuetzen-body {
-  max-width: clamp(280px, 48vw, 640px);
+  /* Gleiche Breite wie das Support-Grid darunter, linksbuendig ausge-
+     richtet (Text nicht zentriert). margin auto zentriert nur den Block
+     selbst im Section-Padding. */
+  max-width: min(1200px, calc(100vw - 144px));
   margin-left: auto;
   margin-right: auto;
   font-size: clamp(14px, 1.15vw, 18px);
   line-height: 1.55;
+  text-align: left;
 }
 body.unterstuetzen-view .support-block {
   max-width: clamp(280px, 48vw, 640px);
@@ -1164,12 +1205,138 @@ body.unterstuetzen-view .unterstuetzen-section .section-cta {
   /* CTA-Reihe analog zu Mission/Team/Kontakt ausgeblendet. */
   display: none;
 }
-/* Schluss-Box auf Unterstuetzen auf die schmalere Body-Breite ziehen und
-   mittig setzen (parent ist hier die Section, nicht der schmale Body). */
+/* Support-Grid: Zeile 1 (Foerdermitgliedschaft + Mitmachen nebeneinander),
+   Zeile 2 (Einmalspende volle Breite mit drei Zahlungsoptionen).
+   Mobile: alles 1-spaltig. */
+body.unterstuetzen-view .support-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: min(1200px, calc(100vw - 144px));
+  margin: 48px auto 0;
+}
+body.unterstuetzen-view .support-grid .support-block {
+  max-width: 100%;
+  margin: 0;
+  /* Flex column: Buttons (letztes Kind) koennen per margin-top:auto ans
+     Boxende gezogen werden, sodass "Foerdermitglied werden" und
+     "Schreiben Sie uns" auf gleicher Zeile sitzen. */
+  display: flex;
+  flex-direction: column;
+}
+body.unterstuetzen-view .support-grid .support-block > .foerder-link,
+body.unterstuetzen-view .support-grid .support-block > .contact-email {
+  /* Buttons an die Box-Unterkante — Grid streckt beide Boxen auf
+     dieselbe Höhe, daher stehen beide Buttons auf exakt gleicher
+     Höhe. Luft zum Fliesstext oberhalb kommt über margin-bottom
+     der Fördermitgliedschafts-Beschreibung (siehe unten). */
+  margin-top: auto;
+  align-self: flex-start;
+}
+/* Mindestabstand zwischen Fördermitgliedschafts-Text und Button,
+   damit der Button im längeren Text-Kasten nicht am Text klebt. */
+body.unterstuetzen-view .support-grid .unterstuetzen-foerder {
+  margin-bottom: 32px;
+}
+body.unterstuetzen-view .support-block--wide {
+  grid-column: 1 / -1;
+  border: none;
+  /* Keine Border + kein Innen-Padding, damit Label, Fliesstext und die
+     drei Zahlungsoptionen bündig mit den beiden Boxen oben und mit
+     der Schluss-Box unten abschließen. */
+  padding: 0;
+}
+/* Einmalspende-Kasten: drei Zahlungsoptionen (Ueberweisung / Stripe /
+   Lastschrift) als 3-Spalten-Sub-Grid innerhalb der breiten Box. */
+body.unterstuetzen-view .donation-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+body.unterstuetzen-view .donation-option {
+  border: 1.5px solid var(--vermil);
+  padding: 20px 22px 22px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+body.unterstuetzen-view .donation-option h4 {
+  font-size: clamp(16px, 1.4vw, 20px);
+  font-weight: 900;
+  color: var(--black);
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+body.unterstuetzen-view .donation-option p {
+  font-size: clamp(13px, 1vw, 16px);
+  line-height: 1.5;
+  color: var(--black);
+  margin: 0 0 10px;
+}
+body.unterstuetzen-view .donation-option .bank-line {
+  font-family: 'Inter', monospace;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--black);
+  word-break: break-word;
+}
+body.unterstuetzen-view .donation-option-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding: 10px 16px;
+  border: 1.5px solid var(--vermil);
+  background: transparent;
+  color: var(--vermil);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: clamp(14px, 1.1vw, 18px);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+body.unterstuetzen-view .donation-option-cta:hover {
+  background: var(--vermil);
+  color: #fff;
+}
+body.unterstuetzen-view .donation-option-cta[disabled],
+body.unterstuetzen-view .donation-option.donation-option--coming .donation-option-cta {
+  border-color: var(--rule);
+  color: var(--mid);
+  cursor: default;
+  pointer-events: none;
+}
+body.unterstuetzen-view .donation-option-cta .arrow-icon {
+  width: 0.5em;
+  height: 0.9em;
+  overflow: visible;
+}
+/* Schluss-Box auf Unterstuetzen auf die neue Grid-Breite ziehen. */
 body.unterstuetzen-view .mission-closing {
-  max-width: clamp(280px, 48vw, 640px);
+  max-width: min(1200px, calc(100vw - 144px));
   margin-left: auto;
   margin-right: auto;
+}
+@media (max-width: 640px) {
+  body.unterstuetzen-view .support-grid,
+  body.unterstuetzen-view .donation-options {
+    grid-template-columns: 1fr;
+  }
+  body.unterstuetzen-view .unterstuetzen-body,
+  body.unterstuetzen-view .support-grid,
+  body.unterstuetzen-view .mission-closing {
+    max-width: calc(100vw - 48px);
+  }
+}
+@media (min-width: 641px) and (max-width: 900px) {
+  body.unterstuetzen-view .unterstuetzen-body,
+  body.unterstuetzen-view .support-grid,
+  body.unterstuetzen-view .mission-closing {
+    max-width: calc(100vw - 96px);
+  }
 }
 
 /* Nav (Ribbon) + Wortmarke: z-index ueber TB (z=6), Nav volle Breite,
@@ -2414,20 +2581,40 @@ body.inverted.unterstuetzen-view { background: var(--vermil); }
       </a>
     </div>
     <p class="unterstuetzen-body" id="unterstuetzen-body" data-de="Wir akzeptieren keinerlei staatliche Förderung. Deshalb freuen wir uns über Ihre Unterstützung — finanziell, durch Ihre Ideen oder Ihre Expertise." data-en="We accept no government funding whatsoever. That is why we welcome your support — financial, through your ideas, or through your expertise.">Wir akzeptieren keinerlei staatliche Förderung. Deshalb freuen wir uns über Ihre Unterstützung — finanziell, durch Ihre Ideen oder Ihre Expertise.</p>
-    <div class="support-block">
-      <p class="foerder-label" id="foerder-label" data-de="Fördermitgliedschaft" data-en="Supporting membership">Fördermitgliedschaft</p>
-      <p class="unterstuetzen-foerder" id="unterstuetzen-foerder" data-de="Mit einer Fördermitgliedschaft tragen Sie unsere Arbeit dauerhaft mit — bereits ab 100 Euro im Jahr. Beträge darüber hinaus gelten steuerlich als Spende und werden mit einer Zuwendungsbestätigung quittiert." data-en="A supporting membership backs our work for the long term — from 100 euros a year onwards. Amounts above the minimum qualify as tax-deductible donations and are confirmed with a receipt.">Mit einer Fördermitgliedschaft tragen Sie unsere Arbeit dauerhaft mit — bereits ab 100 Euro im Jahr. Beträge darüber hinaus gelten steuerlich als Spende und werden mit einer Zuwendungsbestätigung quittiert.</p>
-      <a class="foerder-link" id="foerder-link" href="#" data-de="Fördermitglied werden<svg class=&quot;foerder-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>" data-en="Become a member<svg class=&quot;foerder-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>">Fördermitglied werden<svg class="foerder-arrow" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-    </div>
-    <div class="support-block">
-      <p class="einmalspende-label" id="einmalspende-label" data-de="Einmalspende" data-en="One-time donation">Einmalspende</p>
-      <p class="unterstuetzen-einmalspende" id="unterstuetzen-einmalspende" data-de="Auch eine einmalige Spende unterstützt unsere Arbeit — in jeder Höhe und ohne Bindung. Jeder Betrag wird mit einer Zuwendungsbestätigung quittiert und ist steuerlich absetzbar." data-en="A one-time donation supports our work as well — at any amount, with no commitment. Every contribution is tax-deductible and confirmed with a donation receipt.">Auch eine einmalige Spende unterstützt unsere Arbeit — in jeder Höhe und ohne Bindung. Jeder Betrag wird mit einer Zuwendungsbestätigung quittiert und ist steuerlich absetzbar.</p>
-      <a class="einmalspende-link" id="einmalspende-link" href="#" data-de="Jetzt spenden<svg class=&quot;einmalspende-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>" data-en="Donate now<svg class=&quot;einmalspende-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>">Jetzt spenden<svg class="einmalspende-arrow" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-    </div>
-    <div class="support-block">
-      <p class="mitmachen-label" id="mitmachen-label" data-de="Mitmachen" data-en="Get involved">Mitmachen</p>
-      <p class="unterstuetzen-mitmachen" id="unterstuetzen-mitmachen" data-de="Sie möchten unsere Mission durch Ihre Mitarbeit unterstützen? Lernen Sie bei uns strategische Prozessführung aus erster Hand kennen — wir sind für viele Formen der Zusammenarbeit offen." data-en="Want to support our mission through your work? Experience strategic litigation first-hand with us — we are open to many forms of collaboration.">Sie möchten unsere Mission durch Ihre Mitarbeit unterstützen? Lernen Sie bei uns strategische Prozessführung aus erster Hand kennen — wir sind für viele Formen der Zusammenarbeit offen.</p>
-      <a class="contact-email" id="unterstuetzen-email" href="#" data-de="Schreiben Sie uns<svg class=&quot;contact-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>" data-en="Write to us<svg class=&quot;contact-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>">Schreiben Sie uns<svg class="contact-arrow" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <div class="support-grid">
+      <div class="support-block">
+        <p class="foerder-label" id="foerder-label" data-de="Fördermitgliedschaft" data-en="Supporting membership">Fördermitgliedschaft</p>
+        <p class="unterstuetzen-foerder" id="unterstuetzen-foerder" data-de="Mit einer Fördermitgliedschaft tragen Sie unsere Arbeit dauerhaft mit — bereits ab 100 Euro im Jahr. Beträge darüber hinaus gelten steuerlich als Spende und werden mit einer Zuwendungsbestätigung quittiert." data-en="A supporting membership backs our work for the long term — from 100 euros a year onwards. Amounts above the minimum qualify as tax-deductible donations and are confirmed with a receipt.">Mit einer Fördermitgliedschaft tragen Sie unsere Arbeit dauerhaft mit — bereits ab 100 Euro im Jahr. Beträge darüber hinaus gelten steuerlich als Spende und werden mit einer Zuwendungsbestätigung quittiert.</p>
+        <a class="foerder-link foerder-link--coming" id="foerder-link" href="#" aria-disabled="true" data-de="Demnächst<svg class=&quot;foerder-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>" data-en="Coming soon<svg class=&quot;foerder-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>">Demnächst<svg class="foerder-arrow" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="support-block">
+        <p class="mitmachen-label" id="mitmachen-label" data-de="Mitmachen" data-en="Get involved">Mitmachen</p>
+        <p class="unterstuetzen-mitmachen" id="unterstuetzen-mitmachen" data-de="Sie möchten unsere Mission durch Ihre Mitarbeit unterstützen? Lernen Sie bei uns strategische Prozessführung aus erster Hand kennen — wir sind für viele Formen der Zusammenarbeit offen." data-en="Want to support our mission through your work? Experience strategic litigation first-hand with us — we are open to many forms of collaboration.">Sie möchten unsere Mission durch Ihre Mitarbeit unterstützen? Lernen Sie bei uns strategische Prozessführung aus erster Hand kennen — wir sind für viele Formen der Zusammenarbeit offen.</p>
+        <a class="contact-email" id="unterstuetzen-email" href="#" data-de="Schreiben Sie uns<svg class=&quot;contact-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>" data-en="Write to us<svg class=&quot;contact-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>">Schreiben Sie uns<svg class="contact-arrow" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="support-block support-block--wide">
+        <p class="einmalspende-label" id="einmalspende-label" data-de="Einmalspende" data-en="One-time donation">Einmalspende</p>
+        <p class="unterstuetzen-einmalspende" id="unterstuetzen-einmalspende" data-de="Auch eine einmalige Spende unterstützt unsere Arbeit — in jeder Höhe und ohne Bindung. Jeder Betrag ist steuerlich absetzbar. Zuwendungsbestätigungen verschicken wir jeweils zum Jahreswechsel." data-en="A one-time donation supports our work as well — at any amount, with no commitment. Every contribution is tax-deductible. We send out donation receipts at the turn of each year.">Auch eine einmalige Spende unterstützt unsere Arbeit — in jeder Höhe und ohne Bindung. Jeder Betrag ist steuerlich absetzbar. Zuwendungsbestätigungen verschicken wir jeweils zum Jahreswechsel.</p>
+        <div class="donation-options">
+          <div class="donation-option">
+            <h4 id="don-opt-ueberweisung-title" data-de="Überweisung" data-en="Bank transfer">Überweisung</h4>
+            <p id="don-opt-ueberweisung-text" data-de="Direkt auf unser Vereinskonto bei der FYRST Bank." data-en="Direct transfer to our association account at FYRST Bank.">Direkt auf unser Vereinskonto bei der FYRST Bank.</p>
+            <p class="bank-line">IBAN&nbsp;<span style="font-weight:400">DE53 1007 0399 0079 4206 00</span></p>
+            <p class="bank-line">BIC&nbsp;<span style="font-weight:400">PBNKDEFF</span></p>
+            <button type="button" class="donation-option-cta" id="don-opt-ueberweisung-cta" data-copy="DE53 1007 0399 0079 4206 00" data-de="IBAN kopieren" data-en="Copy IBAN">IBAN kopieren</button>
+          </div>
+          <div class="donation-option">
+            <h4 id="don-opt-stripe-title" data-de="Online spenden" data-en="Donate online">Online spenden</h4>
+            <p id="don-opt-stripe-text" data-de="Kreditkarte, Apple Pay, Google Pay, Giropay und mehr — sicher abgewickelt über Stripe." data-en="Credit card, Apple Pay, Google Pay, Giropay and more — securely processed via Stripe.">Kreditkarte, Apple Pay, Google Pay, Giropay und mehr — sicher abgewickelt über Stripe.</p>
+            <a href="https://donate.stripe.com/3cI5kDfVr7kIemCawR8Zq00" target="_blank" rel="noopener" class="donation-option-cta" id="don-opt-stripe-cta" data-de="Jetzt spenden<svg class=&quot;foerder-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>" data-en="Donate now<svg class=&quot;foerder-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>">Jetzt spenden<svg class="foerder-arrow" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+          <div class="donation-option donation-option--coming">
+            <h4 id="don-opt-lastschrift-title" data-de="SEPA-Lastschrift" data-en="SEPA direct debit">SEPA-Lastschrift</h4>
+            <p id="don-opt-lastschrift-text" data-de="Das Lastschriftverfahren schalten wir in Kürze frei." data-en="We will be enabling SEPA direct debit shortly.">Das Lastschriftverfahren schalten wir in Kürze frei.</p>
+            <button type="button" class="donation-option-cta" disabled id="don-opt-lastschrift-cta" data-de="Demnächst" data-en="Coming soon">Demnächst</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="mission-closing" id="unterstuetzen-closing" data-de="Wir setzen Grundrechte auf die Agenda. <br class=desktop-only><span class=mission-closing-line2>Sind Sie dabei? <br class=mobile-only><a class=&quot;mission-closing-cta js-newsletter-trigger&quot; href=#>Unser Newsletter<svg class=&quot;mission-closing-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg></a></span>" data-en="We're putting fundamental<br class=mobile-only> rights on the agen<span class=desktop-only-inline>-</span><br class=desktop-only><span class=mission-closing-line2>da.<span class=desktop-only-inline> Will you join us?</span><br class=mobile-only> <a class=&quot;mission-closing-cta js-newsletter-trigger&quot; href=#>Our newsletter<svg class=&quot;mission-closing-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg></a></span>">Wir setzen Grundrechte auf die Agenda. <br class=desktop-only><span class=mission-closing-line2>Sind Sie dabei? <br class=mobile-only><a class="mission-closing-cta js-newsletter-trigger" href="#">Unser Newsletter<svg class="mission-closing-arrow" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a></span></div>
     <div class="cta-row section-cta">
@@ -2787,6 +2974,9 @@ function applyLang(lang) {
    'kontakt-newsletter-link','kontakt-mitmachen-link','kontakt-spenden-link',
    'unterstuetzen-headline','unterstuetzen-body','foerder-label','unterstuetzen-foerder','foerder-link',
    'einmalspende-label','unterstuetzen-einmalspende','einmalspende-link',
+   'don-opt-ueberweisung-title','don-opt-ueberweisung-text','don-opt-ueberweisung-cta',
+   'don-opt-stripe-title','don-opt-stripe-text','don-opt-stripe-cta',
+   'don-opt-lastschrift-title','don-opt-lastschrift-text','don-opt-lastschrift-cta',
    'mitmachen-label','unterstuetzen-mitmachen','unterstuetzen-email',
    'unterstuetzen-newsletter-link','unterstuetzen-wer-link','unterstuetzen-fragen-link',
    'team-closing','unterstuetzen-closing','kontakt-closing',
@@ -2952,6 +3142,28 @@ document.addEventListener('click', function(e) {
   if (e.target.closest('.foerder-link') || e.target.closest('.einmalspende-link')) {
     e.preventDefault();
     openModal('coming-soon');
+    return;
+  }
+  /* IBAN-Kopier-Button in der Einmalspende-Box: Clipboard-API,
+     dann kurz Label-Feedback. */
+  var copyBtn = e.target.closest('[data-copy]');
+  if (copyBtn && !copyBtn.disabled) {
+    e.preventDefault();
+    var txt = copyBtn.getAttribute('data-copy');
+    var prev = copyBtn.textContent;
+    var doneLabel = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'Copied ✓' : 'Kopiert ✓';
+    var restore = function() { copyBtn.textContent = prev; };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function() {
+        copyBtn.textContent = doneLabel;
+        setTimeout(restore, 1800);
+      }).catch(function() {
+        /* Fallback: Auswahl anbieten */
+        window.prompt('IBAN', txt);
+      });
+    } else {
+      window.prompt('IBAN', txt);
+    }
     return;
   }
   if (e.target.closest('.fragen-link')) {
