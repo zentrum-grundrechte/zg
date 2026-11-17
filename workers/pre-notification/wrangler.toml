@@ -1,0 +1,24 @@
+name = "zg-pre-notification"
+main = "src/index.js"
+compatibility_date = "2025-11-01"
+
+# Cron: täglich 07:00 UTC = 08:00 Berlin Winter / 09:00 Berlin Sommer.
+# Mail landet also am Vortag im Posteingang und erfüllt damit die
+# "spätestens 1 Tag vor Belastung"-Zusage aus dem SEPA-Mandat.
+[triggers]
+crons = ["0 7 * * *"]
+
+# KV-Binding — identisch zum Pages-Projekt, damit beide denselben
+# Datenbestand lesen/schreiben. Namespace-ID wird vom Dashboard beim
+# Anlegen der Binding automatisch gesetzt; hier nur Platzhalter.
+[[kv_namespaces]]
+binding = "SEPA_MANDATES"
+id = "SET_AT_DEPLOY_TIME"
+
+# Env Vars werden im Cloudflare-Dashboard gesetzt (nicht hier im
+# Repo). Pflichtvariablen:
+#   BREVO_API_KEY        (secret)
+#   CRON_TRIGGER_TOKEN   (secret — nur für manuellen HTTP-Trigger)
+# Optional:
+#   FROM_EMAIL           (default: "Zentrum Grundrechte <kontakt@zentrumgrundrechte.de>")
+#   ADMIN_EMAIL          (default: "kontakt@zentrumgrundrechte.de")
