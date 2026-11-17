@@ -8,15 +8,13 @@ compatibility_date = "2025-11-01"
 [triggers]
 crons = ["0 7 * * *"]
 
-# KV-Binding — identisch zum Pages-Projekt, damit beide denselben
-# Datenbestand lesen/schreiben. Namespace-ID wird vom Dashboard beim
-# Anlegen der Binding automatisch gesetzt; hier nur Platzhalter.
-[[kv_namespaces]]
-binding = "SEPA_MANDATES"
-id = "SET_AT_DEPLOY_TIME"
-
-# Env Vars werden im Cloudflare-Dashboard gesetzt (nicht hier im
-# Repo). Pflichtvariablen:
+# KV-Binding wird NICHT hier konfiguriert, sondern nach dem ersten
+# Deploy im Dashboard eingerichtet (Worker → Settings → Bindings →
+# Add → KV Namespace: Variable "SEPA_MANDATES", Namespace sepa-mandates).
+# Grund: Namespace-ID ist pro Account spezifisch, wäre im Repo nicht
+# sauber zu hinterlegen.
+#
+# Env Vars werden ebenfalls im Cloudflare-Dashboard gesetzt. Pflicht:
 #   BREVO_API_KEY        (secret)
 #   CRON_TRIGGER_TOKEN   (secret — nur für manuellen HTTP-Trigger)
 # Optional:
