@@ -2110,9 +2110,128 @@ body.lang-en .lang-block-en { display: block; }
 }
 
 /* ══════════════════════════════════════
+   SEPA-LASTSCHRIFT-FORMULAR (Modal)
+══════════════════════════════════════ */
+.sepa-modal { max-width: 640px; }
+.sepa-form-wrap > h2 {
+  font-size: clamp(22px, 2.4vw, 32px);
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+  font-weight: 900;
+  color: var(--black);
+}
+.sepa-intro {
+  color: var(--black);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+#sepa-form .sepa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+#sepa-form .sepa-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mid);
+  font-weight: 600;
+}
+#sepa-form .sepa-grid .span-2 { grid-column: span 2; }
+#sepa-form input,
+#sepa-form select {
+  font-family: inherit;
+  font-size: 15px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--rule);
+  background: #fff;
+  color: var(--black);
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+}
+#sepa-form input:focus,
+#sepa-form select:focus { border-color: var(--vermil); }
+#sepa-form input[name="iban"] {
+  font-family: 'Inter', monospace;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+#sepa-form .sepa-consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 22px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--black);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+}
+#sepa-form .sepa-consent input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--vermil);
+}
+.sepa-actions { margin: 24px 0 0; display: flex; align-items: center; gap: 16px; }
+.sepa-submit {
+  background: var(--vermil);
+  color: #fff;
+  border: 1.5px solid var(--vermil);
+  padding: 11px 24px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.sepa-submit:hover { background: transparent; color: var(--vermil); }
+.sepa-submit:disabled { opacity: 0.6; cursor: wait; }
+.sepa-error {
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  background: #fff5f5;
+  border-left: 3px solid var(--vermil);
+  color: var(--vermil);
+  font-size: 13px;
+  line-height: 1.45;
+  display: none;
+}
+.sepa-success { display: none; padding: 8px 0 0; }
+.sepa-success h3 {
+  color: var(--vermil);
+  font-size: clamp(20px, 2.2vw, 28px);
+  margin: 0 0 14px;
+  letter-spacing: -0.01em;
+  font-weight: 900;
+}
+.sepa-success p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--black);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════
    RESPONSIVE — MOBILE
 ══════════════════════════════════════ */
 @media (max-width: 640px) {
+  #sepa-form .sepa-grid { grid-template-columns: 1fr; }
+  #sepa-form .sepa-grid .span-2 { grid-column: span 1; }
   .nav { padding: 20px 24px; }
   .wordmark { top: 20px; left: 24px; font-size: 18px; }
   .wordmark .mark { border-bottom-width: 2px; padding-bottom: 1px; }
@@ -2866,6 +2985,50 @@ body.inverted.unterstuetzen-view { background: var(--vermil); }
   </div>
 </div>
 
+<!-- SEPA-Lastschrift-Modal ────────────────────────────────── -->
+<div class="modal-overlay" id="modal-sepa" onclick="if(event.target===this)closeModal('sepa')">
+  <div class="modal sepa-modal">
+    <button class="modal-close" onclick="closeModal('sepa')" aria-label="Schließen" data-aria-de="Schließen" data-aria-en="Close">✕</button>
+    <div class="sepa-form-wrap">
+      <h2 data-de="SEPA-Lastschriftmandat" data-en="SEPA direct debit mandate">SEPA-Lastschriftmandat</h2>
+      <p class="sepa-intro" data-de="Richten Sie eine einmalige oder wiederkehrende Lastschrift ein. Sie erhalten im Anschluss eine E-Mail mit Bestätigungslink — erst nach dem Klick wird das Mandat gültig." data-en="Set up a one-time or recurring direct debit. You will receive a confirmation link by email — the mandate becomes valid only after you click it.">Richten Sie eine einmalige oder wiederkehrende Lastschrift ein. Sie erhalten im Anschluss eine E-Mail mit Bestätigungslink — erst nach dem Klick wird das Mandat gültig.</p>
+      <form id="sepa-form" novalidate autocomplete="on">
+        <div class="sepa-grid">
+          <label><span data-de="Vorname" data-en="First name">Vorname</span><input name="vorname" required autocomplete="given-name"></label>
+          <label><span data-de="Nachname" data-en="Last name">Nachname</span><input name="nachname" required autocomplete="family-name"></label>
+          <label class="span-2"><span data-de="Straße + Hausnummer" data-en="Street + no.">Straße + Hausnummer</span><input name="strasse" required autocomplete="street-address"></label>
+          <label><span data-de="PLZ" data-en="Postal code">PLZ</span><input name="plz" required inputmode="numeric" pattern="\d{4,5}" autocomplete="postal-code"></label>
+          <label><span data-de="Ort" data-en="City">Ort</span><input name="ort" required autocomplete="address-level2"></label>
+          <label class="span-2"><span data-de="E-Mail" data-en="Email">E-Mail</span><input name="email" type="email" required autocomplete="email"></label>
+          <label class="span-2"><span data-de="IBAN" data-en="IBAN">IBAN</span><input name="iban" required autocomplete="off" inputmode="latin" maxlength="42"></label>
+          <label><span data-de="Betrag (€)" data-en="Amount (€)">Betrag (€)</span><input name="betrag" type="number" min="1" max="100000" step="0.01" required inputmode="decimal"></label>
+          <label><span data-de="Rhythmus" data-en="Frequency">Rhythmus</span>
+            <select name="rhythmus" required>
+              <option value="einmalig" data-de="einmalig" data-en="one-time">einmalig</option>
+              <option value="monatlich" selected data-de="monatlich" data-en="monthly">monatlich</option>
+              <option value="vierteljaehrlich" data-de="vierteljährlich" data-en="quarterly">vierteljährlich</option>
+              <option value="jaehrlich" data-de="jährlich" data-en="yearly">jährlich</option>
+            </select>
+          </label>
+          <label class="span-2"><span data-de="Erstes Belastungsdatum" data-en="First debit date">Erstes Belastungsdatum</span><input name="startdatum" type="date" required></label>
+        </div>
+        <label class="sepa-consent">
+          <input type="checkbox" name="bestaetigung" required>
+          <span data-de="Ich ermächtige das Zentrum Grundrechte e.V. (Gläubiger-ID DE04ZZZ00002950443), Zahlungen von meinem Konto per Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die Lastschriften einzulösen. Die Vorabankündigung erfolgt spätestens einen Tag vor dem Belastungsdatum." data-en="I authorize Zentrum Grundrechte e.V. (Creditor ID DE04ZZZ00002950443) to debit payments from my account by direct debit; I instruct my bank to honor these debits. Pre-notification will be provided at the latest one day before the debit date.">Ich ermächtige das Zentrum Grundrechte e.V. (Gläubiger-ID DE04ZZZ00002950443), Zahlungen von meinem Konto per Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die Lastschriften einzulösen. Die Vorabankündigung erfolgt spätestens einen Tag vor dem Belastungsdatum.</span>
+        </label>
+        <div class="sepa-actions">
+          <button type="submit" class="sepa-submit" data-de="Mandat absenden" data-en="Submit mandate">Mandat absenden</button>
+        </div>
+        <p class="sepa-error" id="sepa-error"></p>
+      </form>
+      <div class="sepa-success" id="sepa-success">
+        <h3 data-de="E-Mail ist unterwegs" data-en="Email on its way">E-Mail ist unterwegs</h3>
+        <p id="sepa-success-text"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const ABWEHR = 'Art. 1 — Die Würde des Menschen ist unantastbar. Sie zu achten und zu schützen ist Verpflichtung aller staatlichen Gewalt. Art. 2 — Jeder hat das Recht auf die freie Entfaltung seiner Persönlichkeit, soweit er nicht die Rechte anderer verletzt. Die Freiheit der Person ist unverletzlich. In diese Rechte darf nur auf Grund eines Gesetzes eingegriffen werden. Art. 4 — Die Freiheit des Glaubens, des Gewissens und die Freiheit des religiösen und weltanschaulichen Bekenntnisses sind unverletzlich. Art. 5 — Jeder hat das Recht, seine Meinung in Wort, Schrift und Bild frei zu äußern und zu verbreiten. Die Pressefreiheit und die Freiheit der Berichterstattung sind gewährleistet. Art. 6 — Ehe und Familie stehen unter dem besonderen Schutze der staatlichen Ordnung. Pflege und Erziehung der Kinder sind das natürliche Recht der Eltern. Art. 8 — Alle Deutschen haben das Recht, sich ohne Anmeldung oder Erlaubnis friedlich und ohne Waffen zu versammeln. Art. 9 — Alle Deutschen haben das Recht, Vereine und Gesellschaften zu bilden. Art. 10 — Das Briefgeheimnis sowie das Post- und Fernmeldegeheimnis sind unverletzlich. Art. 11 — Alle Deutschen genießen Freizügigkeit im ganzen Bundesgebiet. Art. 12 — Alle Deutschen haben das Recht, Beruf, Arbeitsplatz und Ausbildungsstätte frei zu wählen. Art. 13 — Die Wohnung ist unverletzlich. Art. 14 — Das Eigentum und das Erbrecht werden gewährleistet. Enteignung ist nur zum Wohle der Allgemeinheit zulässig. ';
 document.getElementById('bg').textContent = Array(30).fill(ABWEHR).join(' ');
@@ -3487,6 +3650,112 @@ window.__SECTION_VIEW_CONFIGS = [
   window.addEventListener('resize', update);
   window.addEventListener('hashchange', function() { setTimeout(update, 0); });
   update();
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   SEPA-LASTSCHRIFT — Formular-Modal, Validierung, Submit
+   (Backend: /api/sepa/submit und /api/sepa/confirm, siehe
+   functions/ im Repo). Gate: Kachel wird nur sichtbar, wenn
+   Backend tatsächlich erreichbar ist (pages.dev oder sobald
+   Domain umgezogen). Für lokale Vorschau: ?sepa=1 anhängen.
+═══════════════════════════════════════════════════════════ */
+(function() {
+  const form = document.getElementById('sepa-form');
+  if (!form) return;
+
+  // ── IBAN-Eingabe als Gruppen à 4 formatieren
+  const ibanInput = form.elements['iban'];
+  ibanInput.addEventListener('input', () => {
+    const stripped = ibanInput.value.replace(/\s+/g, '').toUpperCase().slice(0, 34);
+    ibanInput.value = stripped.match(/.{1,4}/g)?.join(' ') ?? '';
+  });
+
+  // ── Default-Startdatum: +3 Tage ab heute
+  const startInput = form.elements['startdatum'];
+  if (!startInput.value) {
+    const d = new Date(); d.setDate(d.getDate() + 3);
+    startInput.value = d.toISOString().slice(0, 10);
+    startInput.min = d.toISOString().slice(0, 10);
+  }
+
+  // ── Submit
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const en = document.body.classList.contains('lang-en');
+    const errEl = document.getElementById('sepa-error');
+    errEl.style.display = 'none';
+    errEl.textContent = '';
+    const btn = form.querySelector('.sepa-submit');
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = en ? 'Submitting…' : 'Wird gesendet…';
+
+    const fd = new FormData(form);
+    const payload = {
+      vorname: (fd.get('vorname') || '').toString().trim(),
+      nachname: (fd.get('nachname') || '').toString().trim(),
+      strasse: (fd.get('strasse') || '').toString().trim(),
+      plz: (fd.get('plz') || '').toString().trim(),
+      ort: (fd.get('ort') || '').toString().trim(),
+      email: (fd.get('email') || '').toString().trim(),
+      iban: (fd.get('iban') || '').toString().replace(/\s+/g, '').toUpperCase(),
+      betrag: Number(fd.get('betrag')),
+      rhythmus: (fd.get('rhythmus') || '').toString(),
+      startdatum: (fd.get('startdatum') || '').toString(),
+      bestaetigung: fd.get('bestaetigung') === 'on'
+    };
+
+    try {
+      const res = await fetch('/api/sepa/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({ ok: false, error: 'Serverfehler' }));
+      if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+      form.style.display = 'none';
+      const suc = document.getElementById('sepa-success');
+      const txt = document.getElementById('sepa-success-text');
+      txt.innerHTML = en
+        ? `We just sent a confirmation link to <strong>${escapeHtml(payload.email)}</strong>. Click it within 48 hours to activate your mandate.<br><br>Mandate reference: <strong>${escapeHtml(data.mandatsref)}</strong>`
+        : `Wir haben einen Bestätigungslink an <strong>${escapeHtml(payload.email)}</strong> geschickt. Klicken Sie innerhalb der nächsten 48 Stunden darauf, um Ihr Mandat zu aktivieren.<br><br>Mandatsreferenz: <strong>${escapeHtml(data.mandatsref)}</strong>`;
+      suc.style.display = 'block';
+    } catch (e) {
+      errEl.textContent = (en ? 'Submission failed: ' : 'Fehler beim Absenden: ') + e.message;
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+  });
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  // ── Kachel scharfschalten: nur auf pages.dev oder mit ?sepa=1
+  function enableSepaCard() {
+    const params = new URLSearchParams(location.search);
+    const backendReady = params.has('sepa') || location.hostname.endsWith('.pages.dev');
+    if (!backendReady) return;
+    const cta = document.getElementById('don-opt-lastschrift-cta');
+    const card = cta?.closest('.donation-option');
+    if (!cta || !card) return;
+    card.classList.remove('donation-option--coming');
+    cta.disabled = false;
+    const en = document.body.classList.contains('lang-en');
+    cta.setAttribute('data-de', 'Mandat einrichten');
+    cta.setAttribute('data-en', 'Set up mandate');
+    cta.textContent = en ? 'Set up mandate' : 'Mandat einrichten';
+    cta.onclick = () => {
+      form.style.display = '';
+      document.getElementById('sepa-success').style.display = 'none';
+      document.getElementById('sepa-error').style.display = 'none';
+      openModal('sepa');
+    };
+  }
+  enableSepaCard();
 })();
 </script>
 
