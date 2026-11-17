@@ -24,12 +24,15 @@ functions/
 Auf **github.com/prometheus2211/zg → Settings → Danger Zone → Transfer ownership**,
 Ziel: `zentrum-grundrechte`. Dauert ~30 s, alle Commits bleiben erhalten.
 
-### 2. Resend-Account anlegen (für E-Mail-Versand)
+### 2. Brevo-Account (E-Mail-Versand)
 
-1. resend.com → Sign up mit `kontakt@zentrumgrundrechte.de`.
-2. Domain `zentrumgrundrechte.de` verifizieren (3 DNS-Records: SPF, DKIM, DMARC).
-   Die Records in Cloudflare DNS einsetzen.
-3. API-Key erstellen (nur "Sending access") → notieren.
+ZG nutzt bereits Brevo (für den Newsletter-Aufnahme-Form). Daher:
+
+1. brevo.com → Settings → Senders, Domains → Reiter "Domains" → prüfen, ob
+   `zentrumgrundrechte.de` authentifiziert ist; falls nicht, Brevo-DNS-Records
+   bei **webgo** einsetzen (DNS liegt nicht auf Cloudflare).
+2. Settings → SMTP & API → API Keys → "Generate a new API key" (nur transaktionale
+   Mails) → kopieren.
 
 ### 3. Cloudflare Pages Projekt anlegen
 
@@ -57,7 +60,7 @@ Im Pages-Projekt → **Settings → Environment variables → Production**:
 
 | Variable         | Wert                                                              |
 |------------------|-------------------------------------------------------------------|
-| `RESEND_API_KEY` | aus Schritt 2 (als **Secret** markieren)                          |
+| `BREVO_API_KEY`  | aus Schritt 2 (als **Secret** markieren)                          |
 | `FROM_EMAIL`     | `Zentrum Grundrechte <kontakt@zentrumgrundrechte.de>` *(optional)* |
 | `ADMIN_EMAIL`    | `kontakt@zentrumgrundrechte.de` *(optional)*                      |
 | `SITE_URL`       | `https://zentrumgrundrechte.de` *(optional)*                      |
