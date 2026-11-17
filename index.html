@@ -2213,10 +2213,10 @@ body.lang-en .lang-block-en { display: block; }
 }
 .sepa-success { display: none; padding: 8px 0 0; }
 .sepa-success h3 {
-  color: var(--vermil);
-  font-size: clamp(20px, 2.2vw, 28px);
+  color: var(--black);
+  font-size: clamp(22px, 2.4vw, 32px);
   margin: 0 0 14px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   font-weight: 900;
 }
 .sepa-success p {
@@ -2225,6 +2225,11 @@ body.lang-en .lang-block-en { display: block; }
   color: var(--black);
   margin: 0;
 }
+/* Erfolgs-Modus: nur die Success-Box zeigen, Formular-Überschrift
+   und Intro-Absatz ausblenden. */
+.sepa-form-wrap.success-mode > h2,
+.sepa-form-wrap.success-mode > .sepa-intro,
+.sepa-form-wrap.success-mode > form { display: none; }
 
 /* ══════════════════════════════════════
    RESPONSIVE — MOBILE
@@ -3714,7 +3719,8 @@ window.__SECTION_VIEW_CONFIGS = [
       const data = await res.json().catch(() => ({ ok: false, error: 'Serverfehler' }));
       if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
 
-      form.style.display = 'none';
+      const wrap = form.closest('.sepa-form-wrap');
+      wrap.classList.add('success-mode');
       const suc = document.getElementById('sepa-success');
       const txt = document.getElementById('sepa-success-text');
       txt.innerHTML = en
@@ -3744,12 +3750,14 @@ window.__SECTION_VIEW_CONFIGS = [
     if (!cta || !card) return;
     card.classList.remove('donation-option--coming');
     cta.disabled = false;
+    const chevron = '<svg class="arrow-icon" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    cta.setAttribute('data-de', 'Mandat einrichten' + chevron);
+    cta.setAttribute('data-en', 'Set up mandate' + chevron);
     const en = document.body.classList.contains('lang-en');
-    cta.setAttribute('data-de', 'Mandat einrichten');
-    cta.setAttribute('data-en', 'Set up mandate');
-    cta.textContent = en ? 'Set up mandate' : 'Mandat einrichten';
+    cta.innerHTML = (en ? 'Set up mandate' : 'Mandat einrichten') + chevron;
     cta.onclick = () => {
-      form.style.display = '';
+      const wrap = form.closest('.sepa-form-wrap');
+      wrap.classList.remove('success-mode');
       document.getElementById('sepa-success').style.display = 'none';
       document.getElementById('sepa-error').style.display = 'none';
       openModal('sepa');
