@@ -15,6 +15,23 @@ import { generateMandateRef } from '../../_lib/mandate.js';
 
 const RHYTHM = new Set(['einmalig', 'monatlich', 'vierteljaehrlich', 'jaehrlich']);
 
+// Benutzerfreundliche Labels für Fehlermeldungen
+const LABELS = {
+  vorname: 'Vorname',
+  nachname: 'Nachname',
+  strasse: 'Straße + Hausnummer',
+  plz: 'PLZ',
+  ort: 'Ort',
+  email: 'E-Mail',
+  iban: 'IBAN',
+  bic: 'BIC',
+  betrag: 'Betrag',
+  rhythmus: 'Rhythmus',
+  startdatum: 'Erstes Belastungsdatum',
+  bestaetigung: 'Ermächtigung'
+};
+const label = key => LABELS[key] || key;
+
 function bad(status, message) {
   return new Response(JSON.stringify({ ok: false, error: message }), {
     status,
@@ -24,10 +41,10 @@ function bad(status, message) {
 
 function requireString(obj, key, { max = 200 } = {}) {
   const v = obj[key];
-  if (typeof v !== 'string') throw new Error(`Feld "${key}" fehlt`);
+  if (typeof v !== 'string') throw new Error(`Feld „${label(key)}" fehlt`);
   const t = v.trim();
-  if (!t) throw new Error(`Feld "${key}" fehlt`);
-  if (t.length > max) throw new Error(`Feld "${key}" zu lang`);
+  if (!t) throw new Error(`Feld „${label(key)}" fehlt`);
+  if (t.length > max) throw new Error(`Feld „${label(key)}" zu lang`);
   return t;
 }
 
