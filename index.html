@@ -2729,8 +2729,8 @@ body.inverted.unterstuetzen-view { background: var(--vermil); }
         <a class="contact-email" id="unterstuetzen-email" href="#" data-de="Schreiben Sie uns<svg class=&quot;contact-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>" data-en="Write to us<svg class=&quot;contact-arrow&quot; viewBox=&quot;0 0 14 24&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;><path d=&quot;M3 3 L11 12 L3 21&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/></svg>">Schreiben Sie uns<svg class="contact-arrow" viewBox="0 0 14 24" aria-hidden="true" focusable="false"><path d="M3 3 L11 12 L3 21" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
       <div class="support-block support-block--wide">
-        <p class="einmalspende-label" id="einmalspende-label" data-de="Einmalspende" data-en="One-time donation">Einmalspende</p>
-        <p class="unterstuetzen-einmalspende" id="unterstuetzen-einmalspende" data-de="Auch eine einmalige Spende unterstützt unsere Arbeit — in jeder Höhe und ohne Bindung. Jeder Betrag ist steuerlich absetzbar. Zuwendungsbestätigungen verschicken wir jeweils zum Jahreswechsel." data-en="A one-time donation supports our work as well — at any amount, with no commitment. Every contribution is tax-deductible. We send out donation receipts at the turn of each year.">Auch eine einmalige Spende unterstützt unsere Arbeit — in jeder Höhe und ohne Bindung. Jeder Betrag ist steuerlich absetzbar. Zuwendungsbestätigungen verschicken wir jeweils zum Jahreswechsel.</p>
+        <p class="einmalspende-label" id="einmalspende-label" data-de="Einmalig oder regelmäßig spenden" data-en="Donate once or regularly">Einmalig oder regelmäßig spenden</p>
+        <p class="unterstuetzen-einmalspende" id="unterstuetzen-einmalspende" data-de="Ihre Spende unterstützt unsere Arbeit — in jeder Höhe und ohne Bindung. Jeder Betrag ist steuerlich absetzbar. Zuwendungsbestätigungen verschicken wir jeweils zum Jahreswechsel. Falls Sie ein Projekt gezielt unterstützen möchten, <a href=&quot;#&quot; id=&quot;unterstuetzen-projekt-mail&quot;>kontaktieren</a> Sie uns gerne." data-en="Your donation supports our work — at any amount, with no commitment. Every contribution is tax-deductible. We send out donation receipts at the turn of each year. If you'd like to support a specific project, feel free to <a href=&quot;#&quot; id=&quot;unterstuetzen-projekt-mail-en&quot;>contact</a> us.">Ihre Spende unterstützt unsere Arbeit — in jeder Höhe und ohne Bindung. Jeder Betrag ist steuerlich absetzbar. Zuwendungsbestätigungen verschicken wir jeweils zum Jahreswechsel. Falls Sie ein Projekt gezielt unterstützen möchten, <a href="#" id="unterstuetzen-projekt-mail">kontaktieren</a> Sie uns gerne.</p>
         <div class="donation-options">
           <div class="donation-option">
             <h4 id="don-opt-ueberweisung-title" data-de="Überweisung" data-en="Bank transfer">Überweisung</h4>
@@ -3086,19 +3086,22 @@ if (document.fonts && document.fonts.ready) {
 setTimeout(scheduleAlignBg, 250);
 setTimeout(scheduleAlignBg, 750);
 
-/* ── Email obfuscation: keep mailto: out of raw HTML so crawlers can't harvest ── */
-(function() {
+/* ── Email obfuscation: keep mailto: out of raw HTML so crawlers can't harvest ──
+   Als benannte Funktion, damit sie nach Sprachwechseln neu laufen kann
+   (applyLang überschreibt innerHTML und ersetzt damit Inline-Links). */
+function obfuscateEmails() {
   var d = 'zentrumgrundrechte' + '.' + 'de';
   var mailto = ['mai', 'lto', ':'].join('');
   var hrefKontakt = mailto + 'kontakt' + '@' + d;
   var hrefStaedter = mailto + 'staedter' + '@' + d;
-  ['email-main', 'email-impressum', 'email-impressum-en', 'email-datenschutz', 'email-datenschutz-en', 'email-datenschutz-nl', 'email-datenschutz-nl-en', 'email-newsletter-consent', 'unterstuetzen-email', 'kontakt-mail-icon'].forEach(function(id) {
+  ['email-main', 'email-impressum', 'email-impressum-en', 'email-datenschutz', 'email-datenschutz-en', 'email-datenschutz-nl', 'email-datenschutz-nl-en', 'email-newsletter-consent', 'unterstuetzen-email', 'unterstuetzen-projekt-mail', 'unterstuetzen-projekt-mail-en', 'kontakt-mail-icon'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.href = hrefKontakt;
   });
   var presseEl = document.getElementById('presse-mail-icon');
   if (presseEl) presseEl.href = hrefStaedter;
-})();
+}
+obfuscateEmails();
 
 /* ── Inverted-Modus Toggle (A/B-Vergleich) ──
    Feature-Flag steuert, ob der Invert-Modus überhaupt zur Verfügung steht.
@@ -3172,6 +3175,8 @@ function applyLang(lang) {
     var val = el.getAttribute('data-aria-' + lang);
     if (val) el.setAttribute('aria-label', val);
   });
+  /* mailto:-Links in dynamisch ersetzten innerHTML-Blöcken neu setzen. */
+  if (typeof obfuscateEmails === 'function') obfuscateEmails();
   /* Sprachwahl persistieren, damit ein Reload die Auswahl behaelt. */
   try { localStorage.setItem('zg-lang', lang); } catch (e) { /* ignore */ }
 }
