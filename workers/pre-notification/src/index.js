@@ -74,17 +74,10 @@ async function sendMail(env, { to, subject, html }) {
     sender: parseAddress(fromRaw),
     to: [{ email: to }],
     subject,
-    htmlContent: html,
-    // Brevo-Tracking per Request abschalten (siehe functions/_lib/email.js).
-    headers: {
-      'X-Mailin-Tag': 'transactional-no-tracking',
-      'X-Mailin-Custom': 'no-tracking',
-      'X-sib-trackclicks': '0',
-      'X-sib-trackopens': '0',
-      'X-Mailin-TrackOpen': '0',
-      'X-Mailin-TrackClick': '0'
-    }
+    htmlContent: html
   };
+  // Brevo erlaubt keinen Per-Request-Tracking-Opt-out (bestätigt
+  // 2026-11-18). Anonymisierung läuft über die Konto-Einstellung.
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {

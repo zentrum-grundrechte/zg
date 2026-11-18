@@ -16,22 +16,17 @@ export async function sendMail(env, { to, subject, html, replyTo }) {
   const recipients = (Array.isArray(to) ? to : [to]).map(x =>
     typeof x === 'string' ? { email: x } : x
   );
+  // Hinweis: Brevo erlaubt kontoweit kein vollständiges Abschalten
+  // von Click- und Open-Tracking (bestätigt durch Brevo-Support,
+  // 2026-11-18). Links werden daher über die eigene Branding-Sub-
+  // domain r.kontakt.zentrumgrundrechte.de umgeschrieben. Anonymi-
+  // sierung erfolgt über die Konto-Einstellung „Anonymes E-Mail-
+  // Tracking" in Brevo (IP + Kontakt-Kennung werden entfernt).
   const body = {
     sender,
     to: recipients,
     subject,
     htmlContent: html,
-    // Brevo-Click-/Open-Tracking per Request abschalten. Transaktionale
-    // Mandats-Mails sollen direkt auf zentrumgrundrechte.de zeigen und
-    // keine Tracking-Pixel enthalten (DSGVO + Spender-Vertrauen).
-    headers: {
-      'X-Mailin-Tag': 'transactional-no-tracking',
-      'X-Mailin-Custom': 'no-tracking',
-      'X-sib-trackclicks': '0',
-      'X-sib-trackopens': '0',
-      'X-Mailin-TrackOpen': '0',
-      'X-Mailin-TrackClick': '0'
-    },
     ...(replyTo ? { replyTo: parseAddress(replyTo) } : {})
   };
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
