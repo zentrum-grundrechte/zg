@@ -3761,11 +3761,12 @@ window.__SECTION_VIEW_CONFIGS = [
     return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  // ── Kachel scharfschalten: nur auf pages.dev oder mit ?sepa=1
+  // ── Kachel scharfschalten: Backend (Cloudflare Pages Function) ist
+  // auf der Live-Domain erreichbar. Opt-out per ?sepa=0 falls man die
+  // Kachel lokal testen möchte, ohne den Live-Endpoint zu treffen.
   function enableSepaCard() {
     const params = new URLSearchParams(location.search);
-    const backendReady = params.has('sepa') || location.hostname.endsWith('.pages.dev');
-    if (!backendReady) return;
+    if (params.get('sepa') === '0') return;
     const cta = document.getElementById('don-opt-lastschrift-cta');
     const card = cta?.closest('.donation-option');
     if (!cta || !card) return;
