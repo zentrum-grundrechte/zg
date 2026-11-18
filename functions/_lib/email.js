@@ -21,6 +21,17 @@ export async function sendMail(env, { to, subject, html, replyTo }) {
     to: recipients,
     subject,
     htmlContent: html,
+    // Brevo-Click-/Open-Tracking per Request abschalten. Transaktionale
+    // Mandats-Mails sollen direkt auf zentrumgrundrechte.de zeigen und
+    // keine Tracking-Pixel enthalten (DSGVO + Spender-Vertrauen).
+    headers: {
+      'X-Mailin-Tag': 'transactional-no-tracking',
+      'X-Mailin-Custom': 'no-tracking',
+      'X-sib-trackclicks': '0',
+      'X-sib-trackopens': '0',
+      'X-Mailin-TrackOpen': '0',
+      'X-Mailin-TrackClick': '0'
+    },
     ...(replyTo ? { replyTo: parseAddress(replyTo) } : {})
   };
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
