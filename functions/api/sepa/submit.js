@@ -80,7 +80,16 @@ export async function onRequestPost(ctx) {
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return bad(400, 'Ungültige E-Mail-Adresse');
   const ibanCheck = validateIban(data.iban);
-  if (!ibanCheck.ok) return bad(400, `IBAN ungültig (${ibanCheck.reason})`);
+  if (!ibanCheck.ok) {
+    const IBAN_REASONS = {
+      format: 'ungültiges Format',
+      country_not_sepa: 'Land nicht Teil des SEPA-Raums',
+      length: 'falsche Länge',
+      checksum: 'Prüfziffer stimmt nicht'
+    };
+    const reasonDe = IBAN_REASONS[ibanCheck.reason] || 'ungültig';
+    return bad(400, `IBAN ungültig (${reasonDe})`);
+  }
   if (!(data.betrag > 0) || data.betrag > 100000) return bad(400, 'Betrag ungültig');
   if (!RHYTHM.has(data.rhythmus)) return bad(400, 'Rhythmus ungültig');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data.startdatum)) return bad(400, 'Startdatum ungültig (YYYY-MM-DD)');
