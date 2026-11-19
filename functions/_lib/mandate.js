@@ -1,5 +1,7 @@
 // Mandatstext und Mandatsreferenz-Generator.
 
+import { germanDate, germanDateTime } from './dates.js';
+
 const GLAEUBIGER_ID = 'DE04ZZZ00002950443';
 const ORG_NAME = 'Zentrum Grundrechte e.V.';
 const ORG_STREET = 'Hauptstraße 2b';
@@ -80,13 +82,13 @@ export function renderMandateHtml(data, meta) {
 <dl>
   <dt>Betrag</dt><dd>${betragFmt}</dd>
   <dt>Rhythmus</dt><dd>${rhythmusFmt}</dd>
-  <dt>Erstes Belastungsdatum</dt><dd>${startdatum}</dd>
+  <dt>Erstes Belastungsdatum</dt><dd>${germanDate(startdatum)}</dd>
   <dt>Verwendungszweck</dt><dd>Spende an ${ORG_NAME}</dd>
 </dl>
 
 <div class="audit">
   <strong>Elektronische Erteilung (einfache elektronische Signatur, Art. 3 Nr. 10 eIDAS-VO)</strong><br>
-  Dieses Mandat wurde am <strong>${confirmedAt}</strong> über zentrumgrundrechte.de elektronisch erteilt und per Bestätigungsklick auf einen an die oben genannte E-Mail-Adresse gesendeten Verifizierungslink finalisiert.<br>
+  Dieses Mandat wurde am <strong>${germanDateTime(confirmedAt)}</strong> über zentrumgrundrechte.de elektronisch erteilt und per Bestätigungsklick auf einen an die oben genannte E-Mail-Adresse gesendeten Verifizierungslink finalisiert.<br>
   Bestätigungs-IP: <code>${ip}</code> · User-Agent: <code>${userAgent}</code>
 </div>
 

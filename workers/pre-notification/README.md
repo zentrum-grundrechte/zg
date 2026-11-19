@@ -55,7 +55,13 @@ rausgegangen wäre (bzw. ging, wenn Mails versendet wurden).
 - Läuft über alle `mandate:*`-Keys im KV
 - Filter: `status === 'confirmed'`
 - Berechnet nächstes Belastungsdatum aus `startdatum` + `rhythmus`
+  (immer vom Startdatum aus; Tag 29.–31. wird auf den Monatsletzten gekappt)
 - Wenn nächstes Belastungsdatum == morgen (Berliner Zeit): E-Mail raus
+  (IBAN maskiert)
+- Admin-Übersicht an `ADMIN_EMAIL`: alle Einzüge der nächsten 3 Tage mit
+  voller IBAN, BIC, Mandatsreferenz, Mandatsdatum und Lastschrift-Art
+  (OOFF/FRST/RCUR) zum Einreichen in FYRST; max. 1×/Tag, nur wenn etwas ansteht
+- Manueller Test ohne Versand: `/?token=<CRON_TRIGGER_TOKEN>&dry=1`
 - Dedup via `prenotif:<mandatsref>:<yyyymmdd>` (7 Tage TTL) — verhindert
   Doppelversand, falls der Cron zweimal läuft oder manuell getriggert
   wird.

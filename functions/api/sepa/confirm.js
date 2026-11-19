@@ -4,6 +4,7 @@
 
 import { sendMail } from '../../_lib/email.js';
 import { renderMandateHtml } from '../../_lib/mandate.js';
+import { MIN_LEAD_DAYS_CONFIRM, berlinIsoDate, germanDate } from '../../_lib/dates.js';
 
 function htmlPage(title, body) {
   return new Response(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>${title}</title>
@@ -42,6 +43,17 @@ export async function onRequestGet(ctx) {
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
   const userAgent = request.headers.get('User-Agent') || 'unknown';
 
+  // Wird erst kurz vor dem gewünschten Termin bestätigt, verschieben wir
+  // das erste Belastungsdatum nach hinten, damit die Vorabankündigung
+  // noch spätestens am Vortag rausgehen kann (Zusage aus dem Mandatstext).
+  const earliest = berlinIsoDate(MIN_LEAD_DAYS_CONFIRM);
+  let shifted = false;
+  if (record.data.startdatum < earliest) {
+    record.data.startdatumUrspruenglich = record.data.startdatum;
+    record.data.startdatum = earliest;
+    shifted = true;
+  }
+
   record.status = 'confirmed';
   record.confirmedAt = confirmedAt;
   record.confirmedIp = ip;
@@ -63,7 +75,7 @@ export async function onRequestGet(ctx) {
   await Promise.all([
     sendMail(env, {
       to: adminEmail,
-      subject: `Neues SEPA-Mandat: ${record.mandatsref} · ${record.data.vorname} ${record.data.nachname}`,
+      subject: `Neues SEPA-Mandat: ${record.mandatsref} · ${record.data.vorname} ${record.data.nachname}${shifted ? ` · Startdatum verschoben auf ${germanDate(record.data.startdatum)}` : ''}`,
       html: mandateHtml
     }),
     sendMail(env, {
@@ -76,7 +88,8 @@ export async function onRequestGet(ctx) {
   return htmlPage('Bestätigt', `<h1>Danke — Mandat bestätigt</h1>
 <div class="box">
 <p>Mandatsreferenz: <strong>${record.mandatsref}</strong></p>
-<p>Wir haben Ihnen eine Kopie des Mandats per E-Mail geschickt. Die erste Lastschrift wird frühestens am <strong>${record.data.startdatum}</strong> eingezogen.</p>
+<p>Wir haben Ihnen eine Kopie des Mandats per E-Mail geschickt. Die erste Lastschrift wird frühestens am <strong>${germanDate(record.data.startdatum)}</strong> eingezogen.</p>${shifted ? `
+<p style="font-size:14px;">Da die Bestätigung kurz vor dem ursprünglich gewählten Termin (${germanDate(record.data.startdatumUrspruenglich)}) erfolgte, haben wir das erste Belastungsdatum verschoben, damit wir Ihnen die Lastschrift rechtzeitig vorher ankündigen können.</p>` : ''}
 </div>
 <p>Vielen Dank, dass Sie die Arbeit des Zentrums Grundrechte unterstützen.</p>`);
 }

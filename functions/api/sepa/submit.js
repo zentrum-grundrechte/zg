@@ -12,6 +12,7 @@
 import { validateIban, normalizeIban } from '../../_lib/iban.js';
 import { sendMail } from '../../_lib/email.js';
 import { generateMandateRef } from '../../_lib/mandate.js';
+import { MIN_LEAD_DAYS_SUBMIT, berlinIsoDate, isValidIsoDate, germanDate } from '../../_lib/dates.js';
 
 const RHYTHM = new Set(['einmalig', 'monatlich', 'vierteljaehrlich', 'jaehrlich']);
 
@@ -92,7 +93,11 @@ export async function onRequestPost(ctx) {
   }
   if (!(data.betrag > 0) || data.betrag > 100000) return bad(400, 'Betrag ungültig');
   if (!RHYTHM.has(data.rhythmus)) return bad(400, 'Rhythmus ungültig');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data.startdatum)) return bad(400, 'Startdatum ungültig (YYYY-MM-DD)');
+  if (!isValidIsoDate(data.startdatum)) return bad(400, 'Erstes Belastungsdatum ungültig');
+  const earliest = berlinIsoDate(MIN_LEAD_DAYS_SUBMIT);
+  if (data.startdatum < earliest) {
+    return bad(400, `Das erste Belastungsdatum muss mindestens ${MIN_LEAD_DAYS_SUBMIT} Tage in der Zukunft liegen (frühestens ${germanDate(earliest)}).`);
+  }
   if (!data.bestaetigung) return bad(400, 'Bestätigung der Ermächtigung fehlt');
 
   const mandatsref = generateMandateRef();

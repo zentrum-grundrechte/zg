@@ -3698,12 +3698,14 @@ window.__SECTION_VIEW_CONFIGS = [
     ibanInput.value = stripped.match(/.{1,4}/g)?.join(' ') ?? '';
   });
 
-  // ── Default-Startdatum: +3 Tage ab heute
+  // ── Default-Startdatum: +3 Tage ab heute (= Mindestvorlauf, serverseitig geprüft)
   const startInput = form.elements['startdatum'];
-  if (!startInput.value) {
+  {
     const d = new Date(); d.setDate(d.getDate() + 3);
-    startInput.value = d.toISOString().slice(0, 10);
-    startInput.min = d.toISOString().slice(0, 10);
+    const p = n => String(n).padStart(2, '0');
+    const minIso = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    startInput.min = minIso;
+    if (!startInput.value) startInput.value = minIso;
   }
 
   // ── Submit
